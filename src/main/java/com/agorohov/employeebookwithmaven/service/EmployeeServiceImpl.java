@@ -2,7 +2,9 @@ package com.agorohov.employeebookwithmaven.service;
 
 import com.agorohov.employeebookwithmaven.exception.EmployeeAlreadyAddedException;
 import com.agorohov.employeebookwithmaven.exception.EmployeeNotFoundException;
+import com.agorohov.employeebookwithmaven.exception.UnsupportedNameException;
 import com.agorohov.employeebookwithmaven.model.Employee;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -34,6 +36,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee addEmployee(String firstName, String lastName, int salary, int department) {
+        checkNameChar(firstName, lastName);
         Employee employee = new Employee(firstName, lastName, salary, department);
         if (employees.containsKey(getFullName(employee))) {
             throw new EmployeeAlreadyAddedException("Сотрудник с именем " + firstName + " и фамилией " + lastName + "уже есть, повторное добавление невозможно");
@@ -44,6 +47,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee removeEmployee(String firstName, String lastName) {
+        checkNameChar(firstName, lastName);
         Employee employee = Optional.ofNullable(employees.get(getFullName(firstName, lastName)))
                 .orElseThrow(() -> new EmployeeNotFoundException(
                         "Нет сотрудника с именем " + firstName + " и фамилией " + lastName));
@@ -53,8 +57,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee findEmployee(String firstName, String lastName) {
+        checkNameChar(firstName, lastName);
         return Optional.ofNullable(employees.get(getFullName(firstName, lastName)))
                 .orElseThrow(() -> new EmployeeNotFoundException(
                         "Нет сотрудника с именем " + firstName + " и фамилией " + lastName));
+    }
+
+    // проверка имени на соответствие с таблицей символов
+    private static void checkNameChar(String... names) {
+        for (String name : names) {
+            if (!StringUtils.isAlpha(name)) {
+                throw new UnsupportedNameException("В имени присутствует неподдерживаемый символ");
+            }
+        }
     }
 }
