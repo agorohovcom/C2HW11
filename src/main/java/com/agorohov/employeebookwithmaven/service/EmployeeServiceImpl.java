@@ -2,7 +2,9 @@ package com.agorohov.employeebookwithmaven.service;
 
 import com.agorohov.employeebookwithmaven.exception.EmployeeAlreadyAddedException;
 import com.agorohov.employeebookwithmaven.exception.EmployeeNotFoundException;
+import com.agorohov.employeebookwithmaven.exception.UnsupportedNameException;
 import com.agorohov.employeebookwithmaven.model.Employee;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -34,9 +36,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee addEmployee(String firstName, String lastName, int salary, int department) {
-        Employee employee = new Employee(firstName, lastName, salary, department);
+        String finalFirstName = checkNameCharAndCapitalize(firstName);
+        String finalLastName = checkNameCharAndCapitalize(lastName);
+        Employee employee = new Employee(finalFirstName, finalLastName, salary, department);
         if (employees.containsKey(getFullName(employee))) {
-            throw new EmployeeAlreadyAddedException("Сотрудник с именем " + firstName + " и фамилией " + lastName + "уже есть, повторное добавление невозможно");
+            throw new EmployeeAlreadyAddedException("Сотрудник с именем " + finalFirstName + " и фамилией " + finalLastName + "уже есть, повторное добавление невозможно");
         }
         employees.put(getFullName(employee), employee);
         return employee;
@@ -44,17 +48,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee removeEmployee(String firstName, String lastName) {
-        Employee employee = Optional.ofNullable(employees.get(getFullName(firstName, lastName)))
+        String finalFirstName = checkNameCharAndCapitalize(firstName);
+        String finalLastName = checkNameCharAndCapitalize(lastName);
+        Employee employee = Optional.ofNullable(employees.get(getFullName(finalFirstName, finalLastName)))
                 .orElseThrow(() -> new EmployeeNotFoundException(
-                        "Нет сотрудника с именем " + firstName + " и фамилией " + lastName));
+                        "Нет сотрудника с именем " + finalFirstName + " и фамилией " + finalLastName));
         employees.remove(getFullName(employee));
         return employee;
     }
 
     @Override
     public Employee findEmployee(String firstName, String lastName) {
-        return Optional.ofNullable(employees.get(getFullName(firstName, lastName)))
+        String finalFirstName = checkNameCharAndCapitalize(firstName);
+        String finalLastName = checkNameCharAndCapitalize(lastName);
+        return Optional.ofNullable(employees.get(getFullName(finalFirstName, finalLastName)))
                 .orElseThrow(() -> new EmployeeNotFoundException(
-                        "Нет сотрудника с именем " + firstName + " и фамилией " + lastName));
+                        "Нет сотрудника с именем " + finalFirstName + " и фамилией " + finalLastName));
+    }
+
+    // проверка имени на соответствие с таблицей символов,
+    // форматирование - маленькими буквами, первая заглавная
+    private static String checkNameCharAndCapitalize(String name) {
+        if (!StringUtils.isAlpha(name)) {
+            throw new UnsupportedNameException("В имени присутствует неподдерживаемый символ");
+        }
+        return StringUtils.capitalize(name.toLowerCase());
     }
 }

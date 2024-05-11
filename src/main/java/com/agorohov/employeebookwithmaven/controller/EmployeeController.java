@@ -2,6 +2,7 @@ package com.agorohov.employeebookwithmaven.controller;
 
 import com.agorohov.employeebookwithmaven.exception.EmployeeAlreadyAddedException;
 import com.agorohov.employeebookwithmaven.exception.EmployeeNotFoundException;
+import com.agorohov.employeebookwithmaven.exception.UnsupportedNameException;
 import com.agorohov.employeebookwithmaven.model.Employee;
 import com.agorohov.employeebookwithmaven.service.EmployeeService;
 import org.springframework.http.MediaType;
@@ -39,7 +40,11 @@ public class EmployeeController {
 
     // Перехват указанных исключений с целью вывода в браузер сообщений из исключений
     // Перекрывает @ResponseStatus
-    @ExceptionHandler({EmployeeAlreadyAddedException.class, EmployeeNotFoundException.class})
+    @ExceptionHandler({
+            EmployeeAlreadyAddedException.class,
+            EmployeeNotFoundException.class,
+            UnsupportedNameException.class
+    })
     public String handleEmployeeExceptions(RuntimeException e) {
         e.printStackTrace();
         return e.getMessage();
