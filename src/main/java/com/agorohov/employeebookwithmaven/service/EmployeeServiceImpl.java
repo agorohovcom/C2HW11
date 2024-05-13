@@ -40,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         String finalLastName = checkNameCharAndCapitalize(lastName);
         Employee employee = new Employee(finalFirstName, finalLastName, salary, department);
         if (employees.containsKey(getFullName(employee))) {
-            throw new EmployeeAlreadyAddedException("Сотрудник с именем " + finalFirstName + " и фамилией " + finalLastName + "уже есть, повторное добавление невозможно");
+            throw new EmployeeAlreadyAddedException("Сотрудник с именем " + finalFirstName + " и фамилией " + finalLastName + " уже есть, повторное добавление невозможно");
         }
         employees.put(getFullName(employee), employee);
         return employee;

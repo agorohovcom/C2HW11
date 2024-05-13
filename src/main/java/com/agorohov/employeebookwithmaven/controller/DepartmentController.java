@@ -1,11 +1,12 @@
 package com.agorohov.employeebookwithmaven.controller;
 
-import com.agorohov.employeebookwithmaven.exception.EmployeeAlreadyAddedException;
-import com.agorohov.employeebookwithmaven.exception.EmployeeNotFoundException;
 import com.agorohov.employeebookwithmaven.model.Employee;
 import com.agorohov.employeebookwithmaven.service.DepartmentService;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 import java.util.List;
@@ -51,13 +52,5 @@ public class DepartmentController {
     public String getSumSalary(@RequestParam int departmentId) {
         return "Сумма зарплат всех сотрудников отдела " + departmentId + " за месяц составляет "
                 + departmentService.getSumMonthSalaries(departmentId);
-    }
-
-    // Перехват указанных исключений с целью вывода в браузер сообщений из исключений
-    // Перекрывает @ResponseStatus
-    @ExceptionHandler({EmployeeAlreadyAddedException.class, EmployeeNotFoundException.class})
-    public String handleDepartmentExceptions(RuntimeException e) {
-        e.printStackTrace();
-        return e.getMessage();
     }
 }
